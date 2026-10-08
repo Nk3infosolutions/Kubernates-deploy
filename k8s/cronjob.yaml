@@ -1,0 +1,24 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: cronjob
+spec:
+  concurrencyPolicy: Forbid
+  schedule: '*/15 * * * *'
+  successfulJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app: cronjob
+        spec:
+          containers:
+          - name: cronjob
+            image: curlimages/curl:latest
+            imagePullPolicy: IfNotPresent
+            command:
+            - /bin/sh
+            - -c
+            - curl -f http://bootstorage-svc:5000/api/bootstorage/deletelru || exit 1
+          restartPolicy: Never
